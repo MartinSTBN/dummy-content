@@ -82,6 +82,8 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			$this->set_dimensions( $id );
 			$this->set_images( $id, $_media );
 			$this->set_categories( $id );
+			$this->set_tags( $id );
+			$this->set_downloadable( $id );
 
 
 			if ( is_wp_error( $id ) || ! $id ) {
@@ -174,13 +176,22 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			'hide_empty' => false,
 			'fields'     => 'names',
 			'number'     => random_int( 0, 5 ),
-			'orderby'    => 'name',
-			'order'      => 'DESC'
-
 		);
 
 		$terms = get_terms( $taxonomyCat );
 		wp_set_object_terms( $id, $terms, 'product_cat' );
+	}
+
+	public function set_tags( $id ) {
+		$taxonomyTag = array(
+			'taxonomy'   => 'product_tag',
+			'hide_empty' => false,
+			'fields'     => 'names',
+			'number'     => random_int( 0, 5 )
+		);
+
+		$terms = get_terms( $taxonomyTag );
+		wp_set_object_terms( $id, $terms, 'product_tag' );
 	}
 
 	public function set_stock( $id ) {
@@ -229,5 +240,13 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			update_post_meta( $id, '_sale_price', wc_format_decimal( CPDC_Data_Generator::price( 0, $regular_price - 10 ) ) );
 		}
 
+	}
+
+	public function set_downloadable( $id ) {
+		if ( $this->product->is_downloadable() ) {
+			add_post_meta( $id, '_download_limit', CPDC_Data_Generator::random( array( '', mt_rand( 1, 150 ) ) ) );
+			add_post_meta( $id, '_download_expiry', CPDC_Data_Generator::random( array( '', mt_rand( 1, 150 ) ) ) );
+			add_post_meta( $id, '_download_type', CPDC_Data_Generator::random( array( '', 'application', 'music' ) ) );
+		}
 	}
 }
