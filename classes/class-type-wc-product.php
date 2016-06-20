@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @since 1.0
  */
@@ -8,10 +9,10 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		parent::__construct();
 
 		$this->meta_type = 'wc-product';
-		$this->id        = 'wc-product';
+		$this->id = 'wc-product';
 		$this->post_type = 'product';
-		$this->label     = ucfirst( $this->post_type );
-		$this->product   = null;
+		$this->label = ucfirst( $this->post_type );
+		$this->product = null;
 	}
 
 	private function add_random_id( $post_type = 'any', $post_id ) {
@@ -22,7 +23,7 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		return get_posts( array(
 			'post_type'      => $this->post_type,
 			'fields'         => 'ids',
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_status'    => array( 'any', 'trash' ),
 			'meta_query'     => array(
 				array(
@@ -42,25 +43,25 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		$added_ids = array();
 
 		// Load generator classes
-		$_user     = dc()->get_generator( 'user' );
-		$_media    = dc()->get_generator( 'media' );
+		$_user = dc()->get_generator( 'user' );
+		$_media = dc()->get_generator( 'media' );
 		$_taxonomy = dc()->get_generator( 'taxonomy' );
 
-		for ( $i = 1; $i <= $amount; $i ++ ) {
+		for ( $i = 1; $i <= $amount; $i++ ) {
 
 			$product_type = CPDC_Data_Generator::random( array( 'simple', 'variable' ) );
-			$contents     = CPDC_Data_Generator::contents();
-			$article      = $this->random( $contents );
+			$contents = CPDC_Data_Generator::contents();
+			$article = $this->random( $contents );
 
 			$content = isset( $article['content'] ) ? $article['content'] : '';
 
-			$args          = array(
+			$args = array(
 				'post_title'   => $this->get_product_title(),
 				'post_type'    => $this->post_type,
 				'post_content' => CPDC_Data_Generator::true( 90 ) ? $content . $image : '',
 				'post_excerpt' => CPDC_Data_Generator::true( 40 ) ? $content : '',
 			);
-			$id            = wp_insert_post( $args );
+			$id = wp_insert_post( $args );
 			$this->product = wc_get_product( $id );
 
 			if ( ! $this->product ) {
@@ -158,9 +159,9 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		add_post_meta( $id, '_thumbnail_id', $media->id( 'image' ) );
 
 		$number_of_images = mt_rand( 0, 5 );
-		$images           = array();
-		for ( $i = 0; $i < $number_of_images; $i ++ ) {
-			$images[ ] = $media->id( 'image' );
+		$images = array();
+		for ( $i = 0; $i < $number_of_images; $i++ ) {
+			$images[] = $media->id( 'image' );
 		}
 
 		add_post_meta( $id, '_product_image_gallery', implode( ',', array_unique( $images ) ) );
@@ -203,6 +204,12 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		}
 
 		$regular_price = CPDC_Data_Generator::price( 0, 200 );
+		$sale_price = CPDC_Data_Generator::price( 0, 200 );
+
+		if ( $sale_price > $regular_price ) {
+			return;
+		}
+		update_post_meta( $id, '_sale_price', wc_format_decimal( $sale_price ) );
 		update_post_meta( $id, '_regular_price', wc_format_decimal( $regular_price ) );
 		update_post_meta( $id, '_price', wc_format_decimal( $regular_price ) );
 
