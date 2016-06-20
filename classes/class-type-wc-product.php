@@ -47,6 +47,7 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		$_media = dc()->get_generator( 'media' );
 		$_taxonomy = dc()->get_generator( 'taxonomy' );
 
+
 		for ( $i = 1; $i <= $amount; $i++ ) {
 
 			$product_type = CPDC_Data_Generator::random( array( 'simple', 'variable' ) );
@@ -81,10 +82,9 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			$this->set_stock( $id );
 			$this->set_dimensions( $id );
 			$this->set_images( $id, $_media );
-			$this->set_categories( $id );
-			$this->set_tags( $id );
 			$this->set_downloadable( $id );
-
+			$this->set_taxonomies( $id );
+			
 
 			if ( is_wp_error( $id ) || ! $id ) {
 				continue;
@@ -170,30 +170,6 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		add_post_meta( $id, '_product_image_gallery', implode( ',', array_unique( $images ) ) );
 	}
 
-	public function set_categories( $id ) {
-		$taxonomyCat = array(
-			'taxonomy'   => 'product_cat',
-			'hide_empty' => false,
-			'fields'     => 'names',
-			'number'     => random_int( 0, 5 ),
-		);
-
-		$terms = get_terms( $taxonomyCat );
-		wp_set_object_terms( $id, $terms, 'product_cat' );
-	}
-
-	public function set_tags( $id ) {
-		$taxonomyTag = array(
-			'taxonomy'   => 'product_tag',
-			'hide_empty' => false,
-			'fields'     => 'names',
-			'number'     => random_int( 0, 5 )
-		);
-
-		$terms = get_terms( $taxonomyTag );
-		wp_set_object_terms( $id, $terms, 'product_tag' );
-	}
-
 	public function set_stock( $id ) {
 
 		if ( CPDC_Data_Generator::boolean() ) {
@@ -248,5 +224,40 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			add_post_meta( $id, '_download_expiry', CPDC_Data_Generator::random( array( '', mt_rand( 1, 150 ) ) ) );
 			add_post_meta( $id, '_download_type', CPDC_Data_Generator::random( array( '', 'application', 'music' ) ) );
 		}
+	}
+
+	public function set_taxonomies( $id ) {
+
+		$_taxonomy = dc()->get_generator( 'taxonomy' );
+		$taxonomies = get_object_taxonomies( $this->post_type, 'names' );
+
+		if ( $taxonomies ) {
+			foreach ( $taxonomies as $taxonomy ) {
+				if ( in_array( $taxonomy, array( 'post_format' ) ) ) {
+					continue;
+				}
+				wp_set_post_terms( $id, array( $_taxonomy->term_id( $taxonomy ), $_taxonomy->term_id( $taxonomy ) ), $taxonomy );
+			}
+		}
+
+		$taxonomyCat = array(
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => false,
+			'fields'     => 'names',
+			'number'     => 3
+		);
+
+		$terms = get_terms( $taxonomyCat );
+		wp_set_object_terms( $id, $terms, 'product_cat' );
+
+		$taxonomyTag = array(
+			'taxonomy'   => 'product_tag',
+			'hide_empty' => false,
+			'fields'     => 'names',
+			'number'     => 3
+		);
+
+		$terms = get_terms( $taxonomyTag );
+		wp_set_object_terms( $id, $terms, 'product_tag' );
 	}
 }
