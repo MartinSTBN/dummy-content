@@ -204,14 +204,12 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		}
 
 		$regular_price = CPDC_Data_Generator::price( 0, 200 );
-		$sale_price = CPDC_Data_Generator::price( 0, 200 );
+		$sale_price = $regular_price * 0.9;
 
-		if ( $sale_price > $regular_price ) {
-			return;
-		}
 		update_post_meta( $id, '_sale_price', wc_format_decimal( $sale_price ) );
 		update_post_meta( $id, '_regular_price', wc_format_decimal( $regular_price ) );
 		update_post_meta( $id, '_price', wc_format_decimal( $regular_price ) );
+
 
 		if ( CPDC_Data_Generator::true( 30 ) ) {
 
