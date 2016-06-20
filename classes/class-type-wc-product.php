@@ -84,7 +84,7 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			$this->set_images( $id, $_media );
 			$this->set_downloadable( $id );
 			$this->set_taxonomies( $id );
-			
+
 
 			if ( is_wp_error( $id ) || ! $id ) {
 				continue;
@@ -259,5 +259,8 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 
 		$terms = get_terms( $taxonomyTag );
 		wp_set_object_terms( $id, $terms, 'product_tag' );
+
+
+		add_post_meta( $id, '_featured', CPDC_Data_Generator::random( array( 'yes', 'no' ) ) );
 	}
 }
