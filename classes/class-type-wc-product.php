@@ -81,6 +81,7 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 			$this->set_stock( $id );
 			$this->set_dimensions( $id );
 			$this->set_images( $id, $_media );
+			$this->set_categories( $id );
 
 
 			if ( is_wp_error( $id ) || ! $id ) {
@@ -165,6 +166,21 @@ class CPDC_Type_Wc_Product extends CPDC_Type_Post {
 		}
 
 		add_post_meta( $id, '_product_image_gallery', implode( ',', array_unique( $images ) ) );
+	}
+
+	public function set_categories( $id ) {
+		$taxonomyCat = array(
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => false,
+			'fields'     => 'names',
+			'number'     => random_int( 0, 5 ),
+			'orderby'    => 'name',
+			'order'      => 'DESC'
+
+		);
+
+		$terms = get_terms( $taxonomyCat );
+		wp_set_object_terms( $id, $terms, 'product_cat' );
 	}
 
 	public function set_stock( $id ) {
